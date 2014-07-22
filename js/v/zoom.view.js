@@ -13,6 +13,10 @@ function ZoomView(_model){
 			
 	};
 
+	this.wireDomEvents = function(){
+	
+	};
+
 	this.init = function(){
 		this.wireDomEvents();
 	};
