@@ -7,6 +7,7 @@ function ZoomModel(){
 	this.previousFrame = null;
 	this.currentIndexesFingersPos = null;
 	this.previousIndexesFingersPos = null;
+	this.zoomUpdates = [];
 	
 	this.haveUpdate = function(){
 		emitter.emit('views:haveUpdate');
@@ -92,6 +93,25 @@ function ZoomModel(){
 		};
 
 		var diff = distances.current - distances.old;
+		this.zoom(diff);
+	};
+
+	this.zoom = function(diff){
+		var newWidth = $('#image').width() + (diff * 0.5);
+		var newHeight = $('#image').height() + (diff * 0.5);
+
+		this.zoomUpdates.push({
+			type: 'updateDimensions',
+			width: newWidth,
+			height: newHeight
+		});
+		emitter.emit('views:haveUpdate'); 
+	};
+
+	this.getUpdate = function(){
+		var send = this.zoomUpdates;
+		this.zoomUpdates = [];
+		return send;
 	};
 
 	this.initLeap = function(){
