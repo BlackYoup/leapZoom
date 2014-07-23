@@ -18,7 +18,7 @@ function ZoomModel(){
 
 	this.initWaitForFrame = function(){
 		this.waitForFrame = null;
-		this.waitForFrame = _.after(50, this.onFrame);
+		this.waitForFrame = _.after(10, this.onFrame);
 	};
 
 	this.onFrame = function(frame){
@@ -27,6 +27,7 @@ function ZoomModel(){
 		this.currentFrame = frame;
 		if(this.checkHands(2)){
 			this.defineIndexesPositions();
+			this.makeZoom();
 		}
 	};
 
@@ -57,20 +58,40 @@ function ZoomModel(){
 			var myFingerData = _.filter(self.currentFrame.pointables, function(curFinger){
 				return curFinger.id === fingers[key].id;
 			});
-
 			return {
 				type: key,
-				fingerPos: myFingerData[0].tipPosition
+				x: myFingerData[0].tipPosition[0]
 			};
 		});
 		return myFingers;
 	};
 
 	this.defineIndexesPositions = function(){
-		this.previousIndexesPos = this.currentIndexesFingersPos;
+		this.previousIndexesFingersPos = this.currentIndexesFingersPos;
 		
 		var currentIndexFingers = this.getIndexFingers();
-		this.currentIndexFingersPos = this.getIndexFingersPos(currentIndexFingers);
+		this.currentIndexesFingersPos = this.getIndexFingersPos(currentIndexFingers);
+	};
+
+	this.makeZoom = function(){
+		var cifp = _.map(this.currentIndexesFingersPos, function(val){
+			return {
+				type: val.type,
+				x: val.x < 0 ? val.x *= -1 : val.x
+			} ;
+		});
+		var pfip = _.map(this.previousIndexesFingersPos, function(val){
+			return {
+				type: val.type,
+				x: val.x < 0 ? val.x *= -1 : val.x
+			};
+		});
+		var distances = {
+			old: _.reduce(pfip, function(calcul, distance){ return calcul + distance.x; }, 0),
+			current: _.reduce(cifp, function(calcul, distance){ return calcul + distance.x; }, 0)
+		};
+
+		var diff = distances.current - distances.old;
 	};
 
 	this.initLeap = function(){
