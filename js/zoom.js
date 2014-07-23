@@ -9,6 +9,5 @@ $(document).ready(function(){
 		zoomView = new ZoomView(zoomModel),
 		zoomControler = new ZoomControler();
 
-	
 	zoomControler.init();
 });

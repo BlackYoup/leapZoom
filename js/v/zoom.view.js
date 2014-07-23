@@ -17,7 +17,7 @@ function ZoomView(_model){
 	};
 
 	this.updateDimensions = function(dimensions){
-	    $('#image').animate({
+	    $('#zoomImage').animate({
 	        width: dimensions.width,
 	        height: dimensions.height
 	    }, 100);
@@ -27,9 +27,16 @@ function ZoomView(_model){
 
 	};
 
+	this.giveZoomObject = function(){
+		setTimeout(function(){
+			emitter.emit('controler:setZoomObject', $('#zoomImage'));
+		}, 100); // wait for the image to be rendered. Otherwise, it'll have a with & height of 0px
+	};
+
 	this.init = function(){
 		this.wireDomEvents();
 		this.wireEventEmitter();
+		this.giveZoomObject();
 	};
 
 	emitter.once('init', function(){

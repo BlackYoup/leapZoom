@@ -8,6 +8,7 @@ function ZoomModel(){
 	this.currentIndexesFingersPos = null;
 	this.previousIndexesFingersPos = null;
 	this.zoomUpdates = [];
+	this.zoomObject = null;
 	
 	this.haveUpdate = function(){
 		emitter.emit('views:haveUpdate');
@@ -97,8 +98,8 @@ function ZoomModel(){
 	};
 
 	this.zoom = function(diff){
-		var newWidth = $('#image').width() + (diff * 0.5);
-		var newHeight = $('#image').height() + (diff * 0.5);
+		var newWidth = this.zoomObject.obj.width() + (diff * this.zoomObject.ratio);
+		var newHeight = this.zoomObject.obj.height() + (diff * this.zoomObject.ratio);
 
 		this.zoomUpdates.push({
 			type: 'updateDimensions',
@@ -121,9 +122,27 @@ function ZoomModel(){
 		});
 	};
 
-	this.init = function(){
-		this.initWaitForFrame();
+	this.computeRatio = function(){
+		this.zoomObject['ratio'] = this.zoomObject.obj.width() / this.zoomObject.obj.height();
+	};
+
+	this.wireEventsEmitter = function(){
+		emitter.on('model:setZoomObject', function(obj){
+			self.zoomObject = {
+				obj: obj
+			};
+			self.computeRatio();
+			self.ready();
+		});
+	};
+
+	this.ready = function(){
 		this.initLeap();
+	};
+
+	this.init = function(){
+		this.wireEventsEmitter();
+		this.initWaitForFrame();
 	};	
 
 	emitter.once('init', function(){
